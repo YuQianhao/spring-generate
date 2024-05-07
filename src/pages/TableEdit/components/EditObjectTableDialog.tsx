@@ -126,6 +126,15 @@ export default function EditObjectTableDialog({
             })
             return
         }
+        // 检查字段名称是否符合规则
+        if (!(/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(objectField.fieldName))) {
+            modalApi.error({
+                title: "表结构编辑",
+                content: "字段名称格式不正确，仅支持“a-z”，“A-Z”，“_”和“0-9”，字段开头必须是“a-z”，“A-Z”或“_”。",
+                okText: "好的"
+            })
+            return;
+        }
         changeObjectTableFn(objectField)
         changeModalShowFn(false)
     }

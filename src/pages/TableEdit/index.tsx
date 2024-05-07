@@ -54,26 +54,6 @@ function TableEditContent({project, objectTable, changeObjectTableFn, deleteTabl
     // 生成日志
     const [generateLog, setGenerateLog] = useState<string>("");
 
-    // 更新表格中的字段
-    const updateEditField = (record: ObjectField) => {
-        const fieldArray: ObjectField[] = []
-        for (const item of objectTable.fields) {
-            if (item.id === record.id) {
-                fieldArray.push(record)
-            } else {
-                fieldArray.push(item)
-            }
-        }
-        objectTable.fields = fieldArray;
-        changeObjectTableFn(objectTable)
-
-    }
-
-    // 检查是否有重复的字段名
-    const checkSameNameFn = (fieldName: string, id: number): boolean => {
-        return objectTable.fields.filter(item => item.fieldName === fieldName && item.id !== id).length > 0
-    }
-
     const defineColumns: TableProps['columns'] = [
         {
             key: "fieldName",
@@ -230,7 +210,8 @@ function TableEditContent({project, objectTable, changeObjectTableFn, deleteTabl
                 return <Row key={`operate-` + record.id}>
                     <Col span={12}>
                         <Button type='link' onClick={() => {
-                            ObjectFieldEditCache.CurrentEditObjectField = record;
+                            console.log(record)
+                            ObjectFieldEditCache.CurrentEditObjectField = record
                             setEditDialogShow(true)
                         }}>编辑</Button>
                     </Col>
@@ -253,6 +234,24 @@ function TableEditContent({project, objectTable, changeObjectTableFn, deleteTabl
 
     const warningDialog = (content: string) => {
         modalApi.warning({title: "代码生成", content: content, okText: "好的"})
+    }
+
+    // 更新表格中的字段
+    const updateEditField = (record: ObjectField) => {
+        const fieldArray: ObjectField[] = []
+        for (const item of objectTable.fields) {
+            if (item.id === record.id) {
+                fieldArray.push(record)
+            } else {
+                fieldArray.push(item)
+            }
+        }
+        updateTableFields(fieldArray)
+    }
+
+    // 检查是否有重复的字段名
+    const checkSameNameFn = (fieldName: string, id: number): boolean => {
+        return objectTable.fields.filter(item => item.fieldName === fieldName && item.id !== id).length > 0
     }
 
     /**

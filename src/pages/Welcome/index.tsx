@@ -54,6 +54,6 @@ export default function WelcomePage() {
                 </Col>
             </Row>
         </Row>
-        <Row style={{position:'fixed',bottom:'5px',width:'100%'}} justify='center'>version 1.0.0 build version:47cd76e43.f74bbc2e1baa.f194d07e1fa</Row>
+        <Row style={{position:'fixed',bottom:'5px',width:'100%'}} justify='center'>version 1.0.0-patch-1 build version 47cd76e43.f74bbc2e1baa.f194d07e1fa</Row>
     </PageContainer>
 }
