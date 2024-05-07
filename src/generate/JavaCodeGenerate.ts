@@ -257,6 +257,11 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
         controllerStatement = controllerStatement.replaceAll("#PAGE_SIZE_FIELD_NAME#", this.project.pageSizeFieldName)
         controllerStatement = controllerStatement.replaceAll("#SELECT_METHOD_CALL_HANDLE_BODY#", selectHandleCallStatement);
 
+        // 替换分页字段
+        controllerStatement = controllerStatement.replaceAll("#PAGE_FIELD#", this.project.pageFieldName);
+        controllerStatement = controllerStatement.replaceAll("#DATA_SIZE_FIELD#", this.project.pageSizeFieldName);
+
+        // 去除多余空行
         controllerStatement = controllerStatement.replace(/(\r?\n[^\S\n]*){2,}/g, '\n\n');
 
         const controllerPath = this.generate.makePath([this.projectJavaSrcPath(), "controller", "template", `${table.tableName}ControllerTemplate.java`]);

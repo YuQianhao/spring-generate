@@ -114,7 +114,7 @@ public class #CLASS_NAME#ControllerTemplate extends #CLASS_NAME#ServiceTemplate{
         this.onHandleSelectBefore(select,params,selectHolder);
         #SELECT_METHOD_CALL_HANDLE_BODY#
         
-        return onHandleSelectAfter(selectHolder.pageDynamic(select.page,select.pageSize));
+        return onHandleSelectAfter(selectHolder.pageDynamic(select.#PAGE_FIELD#,select.#DATA_SIZE_FIELD#));
     }
 
 }
