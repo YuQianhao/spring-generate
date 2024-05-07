@@ -9,12 +9,14 @@
 **Debug 模式运行**
 
 ```text
+yarn
 yarn tauri dev
 ```
 
 **Release模式发行**
 
 ```text
+yarn
 yarn tauri build
 ```
 
