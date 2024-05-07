@@ -236,10 +236,26 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
             }
         }
 
+        // 分页页码和分页长度字段
+        const pageFieldName = this.project.pageFieldName;
+        const pageSizeFieldName = this.project.pageSizeFieldName;
         selectClassStatement += `
-            public Integer ${this.project.pageFieldName};
-            public Integer ${this.project.pageSizeFieldName};
+            public Integer ${pageFieldName};
+            public Integer ${pageSizeFieldName};
         `;
+        // 增加SelectClass构造方法中分页和页码字段的赋值
+        selectClassConstructorStatement += `
+                    if (params.containsKey("${pageFieldName}")) {
+                        this.${pageFieldName} = (Integer) params.get("${pageFieldName}");
+                    }else{
+                        this.${pageFieldName} = null;
+                    }
+                    if (params.containsKey("${pageSizeFieldName}")) {
+                        this.${pageSizeFieldName} = (Integer) params.get("${pageSizeFieldName}");
+                    }else{
+                        this.${pageSizeFieldName} = null;
+                    }
+                    `;
 
         selectHandleMethodStatement += `
         protected ${table.tableName}ServiceTemplate.SelectHolder onHandleSelectBefore(${table.tableName}_Select select, Map<String, Object> params, ${table.tableName}ServiceTemplate.SelectHolder selectHolder) {
@@ -253,13 +269,13 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
         controllerStatement = controllerStatement.replaceAll("#SELECT_CLASS_FIELD_BODY#", selectClassStatement);
         controllerStatement = controllerStatement.replaceAll("#SELECT_CLASS_CONSTRUCTOR_BODY#", selectClassConstructorStatement);
         controllerStatement = controllerStatement.replaceAll("#SELECT_HANDLE_METHOD#", selectHandleMethodStatement)
-        controllerStatement = controllerStatement.replaceAll("#PAGE_FIELD_NAME#", this.project.pageFieldName)
-        controllerStatement = controllerStatement.replaceAll("#PAGE_SIZE_FIELD_NAME#", this.project.pageSizeFieldName)
+        controllerStatement = controllerStatement.replaceAll("#PAGE_FIELD_NAME#", pageFieldName)
+        controllerStatement = controllerStatement.replaceAll("#PAGE_SIZE_FIELD_NAME#", pageSizeFieldName)
         controllerStatement = controllerStatement.replaceAll("#SELECT_METHOD_CALL_HANDLE_BODY#", selectHandleCallStatement);
 
         // 替换分页字段
-        controllerStatement = controllerStatement.replaceAll("#PAGE_FIELD#", this.project.pageFieldName);
-        controllerStatement = controllerStatement.replaceAll("#DATA_SIZE_FIELD#", this.project.pageSizeFieldName);
+        controllerStatement = controllerStatement.replaceAll("#PAGE_FIELD#", pageFieldName);
+        controllerStatement = controllerStatement.replaceAll("#DATA_SIZE_FIELD#", pageSizeFieldName);
 
         // 去除多余空行
         controllerStatement = controllerStatement.replace(/(\r?\n[^\S\n]*){2,}/g, '\n\n');
