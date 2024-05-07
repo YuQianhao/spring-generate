@@ -399,11 +399,11 @@ function ProjectSettingCard({config, updateConfigFn}: ProjectSlot) {
             const fileName = file.toString();
             if (!fileName.endsWith("build.gradle") && !fileName.endsWith("pom.xml")) {
                 messageApi.warning({content: "您选择的不是 'Spring Boot' 的工程配置文件，配置文件通常是 'build.gradle' ， 或者是 'pom.xml' 。"})
-            } else {
-                config.projectPath = Files.getParentPath(file.toString())
-                changeConfigUpdate()
-                refreshFormValues()
+                return
             }
+            config.projectPath = Files.getParentPath(file.toString())
+            changeConfigUpdate()
+            refreshFormValues()
         }
     }
 
