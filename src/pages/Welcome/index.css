@@ -1,0 +1,12 @@
+.welcome-button{
+    width: 230px;
+    height: 50px;
+    border-radius: 0;
+    float: left;
+}
+
+.welcome-button-group{
+    margin-top: 100px;
+    width: 480px;
+    margin-left: calc(50% - 240px);
+}
