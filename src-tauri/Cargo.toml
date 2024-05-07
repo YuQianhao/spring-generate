@@ -1,7 +1,7 @@
 [package]
 name = "SpringGenerate"
 version = "1.0.0"
-description = "Spring's rapid development tools."
+description = "Spring rapid development tools."
 authors = ["YuQianhao"]
 edition = "2021"
 
