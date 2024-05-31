@@ -8,6 +8,7 @@ package #PACKAGE_NAME#.controller.template;
 import java.util.*;
 import java.util.Date;
 import org.springframework.transaction.annotation.Transactional;
+import #PACKAGE_NAME#.exception.template.SpringGenerateBusinessException;
 import #PACKAGE_NAME#.entity.#CLASS_NAME#;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class #CLASS_NAME#ControllerTemplate extends #CLASS_NAME#ServiceTemplate{
         
         public void examine() {
             if (id == null) {
-                throw new RuntimeException("要查询的对象'id'格式不正确，id通常为Integer类型的数据，并且不能是空的。");
+                throw new SpringGenerateBusinessException("要查询的对象'id'格式不正确，id通常为Integer类型的数据，并且不能是空的。");
             }
         }
     }   
@@ -38,13 +39,13 @@ public class #CLASS_NAME#ControllerTemplate extends #CLASS_NAME#ServiceTemplate{
     
     protected #CLASS_NAME# onHandleRemoveBefore(#CLASS_NAME# object) {
         if (object == null) {
-            throw new RuntimeException("要删除的#TABLE_CN_NAME#对象不存在。");
+            throw new SpringGenerateBusinessException("要删除的#TABLE_CN_NAME#对象不存在。");
         }
         return object;
     }
 
     protected Object onHandleRemoveAfter(#CLASS_NAME# object) {
-        throw new RuntimeException("没有找到“onHandleRemoveAfter”方法的实现。");
+        throw new SpringGenerateBusinessException("没有找到“onHandleRemoveAfter”方法的实现。");
     }
     
     @Transactional
@@ -104,13 +105,13 @@ public class #CLASS_NAME#ControllerTemplate extends #CLASS_NAME#ServiceTemplate{
     public Object select(@RequestBody Map<String, Object> params) {
         var select = new #CLASS_NAME#_Select(params);
         if (select.#PAGE_FIELD_NAME# == null || select.#PAGE_FIELD_NAME# < 1) {
-            throw new RuntimeException("字段'#PAGE_FIELD_NAME#'的值不能小于1，这个字段是Integer类型，在这里也不能是空的。");
+            throw new SpringGenerateBusinessException("字段'#PAGE_FIELD_NAME#'的值不能小于1，这个字段是Integer类型，在这里也不能是空的。");
         }
         if (select.#PAGE_SIZE_FIELD_NAME# == null || select.#PAGE_SIZE_FIELD_NAME# < 1 || select.#PAGE_SIZE_FIELD_NAME# > 20) {
-            throw new RuntimeException("字段'#PAGE_SIZE_FIELD_NAME#'的值不能小于1，并且不能大于20，这个字段是Integer类型，在这里也不能是空的。");
+            throw new SpringGenerateBusinessException("字段'#PAGE_SIZE_FIELD_NAME#'的值不能小于1，并且不能大于20，这个字段是Integer类型，在这里也不能是空的。");
         }
         
-        GoodsServiceTemplate.SelectHolder selectHolder=select();
+        #CLASS_NAME#ServiceTemplate.SelectHolder selectHolder=select();
         this.onHandleSelectBefore(select,params,selectHolder);
         #SELECT_METHOD_CALL_HANDLE_BODY#
         

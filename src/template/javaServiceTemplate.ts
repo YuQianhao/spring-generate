@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import #PACKAGE_NAME#.entity.#CLASS_NAME#;
 import #PACKAGE_NAME#.mapper.#CLASS_NAME#Mapper;
+import #PACKAGE_NAME#.exception.template.HolderNotMatchSelectException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;

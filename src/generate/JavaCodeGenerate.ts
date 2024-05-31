@@ -12,7 +12,10 @@ import {
     JavaEntityTemplate
 } from "../template/javaEntity.ts";
 import {JavaMapperTemplate} from "../template/javaMapper.ts";
-import {JavaHolderNotMatchSelectExceptionTemplate} from "../template/javaException.ts";
+import {
+    JavaHolderNotMatchSelectExceptionTemplate,
+    JavaSpringGenerateBusinessExceptionTemplate
+} from "../template/javaException.ts";
 import {JavaServiceTemplate} from "../template/javaServiceTemplate.ts";
 import {JavaControllerTemplate} from "../template/javaController.ts";
 import {ObjectField, ObjectFieldSaveMode, ObjectFieldSelectMode} from "../models/ObjectField.ts";
@@ -33,6 +36,7 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
 
     async onGenerate(table: ObjectTable): Promise<void> {
         await this.generateTemplate();
+        await this.generateException();
         await this.generateController(table);
         await this.generateEntity(table);
         await this.generateMapper(table);
@@ -44,6 +48,39 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
      */
     projectJavaSrcPath(): string {
         return this.generate.makePath([this.project.projectPath, "src", "main", "java", this.generate.packagePath(this.project)])
+    }
+
+    /**
+     * 检查Src路径是否存在，如果不存在，就创建
+     * @param directorPath  路径
+     */
+    private async makeSrcDirector(directorPath: string): Promise<void> {
+        if (!(await fs.exists(directorPath))) {
+            await fs.createDir(directorPath, {recursive: true});
+        }
+    }
+
+    /**
+     * 生成异常
+     */
+    private async generateException(): Promise<void> {
+        const templatePath = this.generate.makePath([this.projectJavaSrcPath(), "exception", "template"])
+        // 检查路径是否存在
+        await this.makeSrcDirector(templatePath)
+
+        // 生成 HolderNotMatchSelectException 异常类
+        const holderNotMatchSelectExceptionTemplatePath = this.generate.makePath([templatePath, "HolderNotMatchSelectException.java"]);
+        if (!(await fs.exists(holderNotMatchSelectExceptionTemplatePath))) {
+            await fs.writeTextFile(holderNotMatchSelectExceptionTemplatePath, JavaHolderNotMatchSelectExceptionTemplate.replaceAll("#PACKAGE_NAME#", this.project.packageName));
+            this.generate.logI(`HolderNotMatchSelectException 生成成功`)
+        }
+
+        // 生成SpringGenerateBusinessException异常
+        const springGenerateBusinessExceptionTemplatePath = this.generate.makePath([templatePath, "SpringGenerateBusinessException.java"]);
+        if (!(await fs.exists(springGenerateBusinessExceptionTemplatePath))) {
+            await fs.writeTextFile(springGenerateBusinessExceptionTemplatePath, JavaSpringGenerateBusinessExceptionTemplate.replaceAll("#PACKAGE_NAME#", this.project.packageName));
+            this.generate.logI(`SpringGenerateBusinessException 生成成功`)
+        }
     }
 
     /**
@@ -139,7 +176,7 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
                     return save;
                 }
                 
-                protected Goods onHandleFieldSave${firstUpperFieldName}Before(${table.tableName} entity) {
+                protected ${table.tableName} onHandleFieldSave${firstUpperFieldName}Before(${table.tableName} entity) {
                     return entity;
                 }
             
@@ -291,36 +328,22 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
      */
     private async generateTemplate(): Promise<void> {
         const templatePath = this.generate.makePath([this.projectJavaSrcPath(), "service", "template"])
-        // 检查路径是否存在
-        if (!(await fs.exists(templatePath))) {
-            await fs.createDir(templatePath, {recursive: true});
-        }
-
-        // 检查模板HolderNotMatchSelectException是否存在
-        const holderNotMatchSelectExceptionTemplatePath = this.generate.makePath([templatePath, "HolderNotMatchSelectException.java"]);
-        if (!(await fs.exists(holderNotMatchSelectExceptionTemplatePath))) {
-            await fs.writeTextFile(holderNotMatchSelectExceptionTemplatePath, JavaHolderNotMatchSelectExceptionTemplate.replaceAll("#PACKAGE_NAME#", this.project.packageName));
-            this.generate.logI(`HolderNotMatchSelectException 生成成功`)
-        }
+        await this.makeSrcDirector(templatePath)
 
         // 检查“BaseEntity”是否存在，不存在就生成
         const entityPath = this.generate.makePath([this.projectJavaSrcPath(), "entity"])
-        // 检查路径是否存在
-        if (!(await fs.exists(entityPath))) {
-            await fs.createDir(entityPath, {recursive: true});
-        }
+        await this.makeSrcDirector(entityPath)
+
+        // 创建 BaseEntity
         const baseEntityPath = this.generate.makePath([entityPath, "BaseEntity.java"])
         if (!(await fs.exists(baseEntityPath))) {
             await fs.writeTextFile(baseEntityPath, JavaBaseEntityTemplate.replaceAll("#PACKAGE_NAME#", this.project.packageName));
             this.generate.logI(`BaseEntity 生成成功`)
         }
 
+        // 创建Controller目录
         const controllerPath = this.generate.makePath([this.projectJavaSrcPath(), "controller", "template"])
-        // 检查路径是否存在
-        if (!(await fs.exists(controllerPath))) {
-            await fs.createDir(controllerPath, {recursive: true});
-        }
-
+        await this.makeSrcDirector(controllerPath)
     }
 
     /**
@@ -328,6 +351,7 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
      */
     private async generateService(table: ObjectTable): Promise<void> {
         const templatePath = this.generate.makePath([this.projectJavaSrcPath(), "service", "template"])
+        await this.makeSrcDirector(templatePath)
 
         // 生成Java Service文件
         let serviceTemplate = JavaServiceTemplate.replaceAll("#PACKAGE_NAME#", this.project.packageName)
@@ -343,9 +367,7 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
      */
     private async generateMapper(table: ObjectTable): Promise<void> {
         const directorPath = this.generate.makePath([this.projectJavaSrcPath(), "mapper"])
-        if (!(await fs.exists(directorPath))) {
-            await fs.createDir(directorPath, {recursive: true});
-        }
+        await this.makeSrcDirector(directorPath)
 
         let mapperTemplate = JavaMapperTemplate.replaceAll("#PACKAGE_NAME#", this.project.packageName);
         mapperTemplate = mapperTemplate.replaceAll("#CLASS_NAME#", table.tableName)
@@ -359,9 +381,7 @@ export class JavaCodeGenerate implements ICodeGenerateAction {
      */
     private async generateEntity(table: ObjectTable): Promise<void> {
         const directorPath = this.generate.makePath([this.project.projectPath, "src", "main", "java", this.generate.packagePath(this.project), "entity"])
-        if (!(await fs.exists(directorPath))) {
-            await fs.createDir(directorPath, {recursive: true});
-        }
+        await this.makeSrcDirector(directorPath)
 
         let entityTemplate = JavaEntityTemplate.replaceAll("#PACKAGE_NAME#", this.project.packageName);
         entityTemplate = entityTemplate.replaceAll("#CLASS_NAME#", table.tableName);
