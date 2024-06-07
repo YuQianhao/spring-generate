@@ -6,9 +6,9 @@
 
 ``Spring Generate``是一款基于**Tauri**和**Antd**开发的**非侵入式 Spring 项目代码生成器**，他可以为你完成所有的**非定制业务**场景下的功能。目的是为了能够减少开发过程中一些重复的工作。
 
-:eyes:例如我们有一个``User``业务，需要对这个业务分别创建``User SQL``，``UserService``、``UserMapper``、``User``、``UserController``以及对应的``CURD``接口。这些工作重复又繁琐，占用了我们大量的时间。通过这个软件，可以通过``可视化``的创建``表结构``内容，我们会根据你创建的表结构内容，自动生成``User SQL``，``UserService``、``UserMapper``、``User``和``UserController``，并且会在``Controller``中创建好相应的``CURD``接口，在``Service``中创建好常用的操作数据库的方法，省略主动编写这些代码的时间。
+**Spring Generate 工具生成的内容**
 
-:exclamation:但是，请注意，这个软件并没有提供任何``ORM``框架​，也不会改动项目中的代码，只是基于某一些ROM框架，生成一些我们常写的代码。
+![](./readme-images/generate-structure.svg)
 
 ## 二、平台
 
@@ -58,7 +58,7 @@ yarn tauri build
 
 > [!Note]
 >
-> 我们在这里说的项目指的是**Spring Genreate项目**，而不是**Spring Boot项目**。
+> 我们在这里说的项目指的是**Spring Genreate项目**，而不是**Spring Boot项目**，请不要混淆。
 
 ```text
 UserProject
@@ -83,9 +83,134 @@ UserProject
 
 ![](./readme-images/new-project-1.png)
 
-在这个页面中，我们提供了一些需要主动设置的配置内容。其中“项目名称”，“项目包名”，“项目路径”为必填项。
+在这个页面中，我们提供了一些需要主动设置的配置内容。其中**“项目名称”**，**“项目包名”**，**“项目路径”**为必填项。
 
-> 我们建议您将
+> [!Note]
+>
+> “项目包名”最好和Spring Boot项目的包名一致，这样可以少配置``MapperScan``扫描的路径。
+>
+> “项目路径”需要选择项目根目录下的**build.gradle**，或者**pom.xml**，这分别对应了**Gradle项目**和**Mavem项目**。请按照您实际项目的构建类型选择。
+
+#### （2）、数据库
+
+![](./readme-images/new-project-2.png)
+
+在这个页面中需要配置您项目的数据库连接。目前我们只支持**MySQL**引擎和**MyBatis Plus**的ORM框架。配置完成后可以点击**测试连接**来检查数据库连接是否正常。
+
+> [!Tip]
+>
+> 后期我们将逐步接入"TiDB"，“MyBatis Flex”，“JPA”，“InfluxDB”等相关的支持。
+
+#### （3）、代码生成
+
+![](./readme-images/new-project-3.png)
+
+这是创建项目的最后一步：配置项目的代码生成规则。
+
+* **数据库字段大写**：
+
+  * **默认**：生成器不处理Java类映射到数据库的字段名大小写
+
+    ```java
+    // 在Java类配置中
+    public class User{
+        
+        @TableField("userName")
+        private String userName;
+        
+    }
+    ```
+
+    ```text
+    -- 在SQL中的字段名
+    
+    ----------------------------------
+    |    字段名    |      数据类型      |
+    ----------------------------------
+    |   userName  |      VARCHAR      |
+    ----------------------------------
+    ```
+
+  * **全大写**：生成器会将Java类映射到数据库的字段名全更改为大写
+
+    ```java
+    // 在Java类配置中
+    public class User{
+        
+        @TableField("USERNAME")
+        private String userName;
+        
+    }
+    ```
+
+    ```text
+    -- 在SQL中的字段名
+    
+    ----------------------------------
+    |    字段名    |      数据类型      |
+    ----------------------------------
+    |   USERNAME  |      VARCHAR      |
+    ----------------------------------
+    ```
+
+  * **全小写**：生成器会将Java类映射到数据库的字段名全更改为小写
+
+    ```java
+    // 在Java类配置中
+    public class User{
+        
+        @TableField("suername")
+        private String userName;
+        
+    }
+    ```
+
+    ```text
+    -- 在SQL中的字段名
+    
+    ----------------------------------
+    |    字段名    |      数据类型      |
+    ----------------------------------
+    |   username  |      VARCHAR      |
+    ----------------------------------
+    ```
+
+* **数据库字段前缀**：
+
+  这个配置会影响**表结构名称**和**字段名称**的命名规则。如果我们设置前缀为“UP_”，那么在生成时，结果如下所示。
+
+  ```java
+  @TableName("UP_USER")
+  public class User{
+      
+      @TableField("UP_USERNAME")
+      private String userName;
+      
+  }
+  ```
+
+  ```text
+  -- 在SQL中的字段名
+  
+  ----------------------------------
+  |    字段名    |      数据类型      |
+  ----------------------------------
+  | UP_USERNAME |      VARCHAR      |
+  ----------------------------------
+  
+  -- 表结构名称
+  UP_USER
+  ```
+
+* **生成时备份**：
+
+  这个配置会影响在生成代码时是否备份旧的代码文件。
+
+  例如我们在生成``UserController``，但是目录下已经存在一个``UserController``文件了，如果选择备份文件，我们会将已经存在的``UserController``重命名做备份，然后再将新的文件写入；否则会直接覆盖写入。
+
+  > [!Note]
+  >
+  > 对于数据库表，无论是否选择备份，都会将已经存在的，并且冲突的表，重命名做备份。这里的设置只会影响生成的**非数据库文件**。
 
 **发行日志**
 
