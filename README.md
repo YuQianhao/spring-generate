@@ -8,13 +8,19 @@
 
 **Spring Generate 工具生成的内容**
 
+这个工具可以根据您配置的数据结构内容，生成对应的**表结构**，**Controller**，**Mapper**，**Service**，**Entity**，**Exception**和**数据库字典**，如下所示。
+
 ![](./readme-images/generate-structure.svg)
+
+> [!Tip]
+>
+> 在生成的**Controller**，**Mapper**，**Service**，**Entity**，**Exception**中将会内置大量的数据库操作代码，涵盖了大部分的增删改查功能，同时在**Controller**中，会生成相应的增删改查接口。
 
 ## 二、平台
 
-* Windows：:white_check_mark:
-* Mac OS：:white_check_mark:
-* Linux：:interrobang:（我们没有在这个平台中做过测试，故此标注不明确的支持程度）
+* Windows： :white_check_mark:
+* Mac OS：​ :white_check_mark:
+* Linux：​ :interrobang:（我们没有在这个平台中做过测试，故此标注不明确的支持程度）
 
 ## 三、运行
 
@@ -211,6 +217,74 @@ UserProject
   > [!Note]
   >
   > 对于数据库表，无论是否选择备份，都会将已经存在的，并且冲突的表，重命名做备份。这里的设置只会影响生成的**非数据库文件**。
+
+* **分页页码字段**：
+
+  这个字段会影响生成的**select**接口参数。
+
+  在生成接口时，会生成一个**分页查询**接口，这个接口需要一个**分页页码字段**，这个字段的名称将会在这里配置。
+
+  ```java
+  // 查询接口的参数
+  class SelectParams{
+      
+      // 分页页码
+      public Integer page;
+      
+  }
+  ```
+
+* **分页数据长度字段**：
+
+  这个字段与“分页页码字段”组合使用，用于表示按照**dataSize**来分页。
+
+  ```java
+  // 查询接口的参数
+  class SelectParams{
+      
+      // 分页页码
+      public Integer page;
+      
+      // 数据长度
+      public Integer dataSize;
+      
+  }
+  ```
+
+#### （4）、完成
+
+全部配置好后，点击**创建项目**，完成项目的创建。您可以在这个页面再次检查配置是否符合您的要求。
+
+项目创建成功后，软件会退回到**欢迎页面**，此时观察您的**Spring Boot项目src的目录**，会变成如下所示的结构。
+
+```text
+UserProject
+│
+└─ src
+   ├─ main
+   │  ├─ expands
+   │  ├─ main
+   │  └─ test
+   └─ test
+```
+
+其中，main和test都是Spring Boot项目默认创建的，而**expands**是**Spring Generate**工具创建的，您所配置的所有内容，都是被存储到这个目录中。我们现在只需要关注**expands**目录。
+
+```text
+expands
+│
+└─ SpringGenerate
+   ├─ document
+   ├─ sql
+   ├─ src
+   └─ project.sg.json
+```
+
+* **SpringGenerate**：
+  * **document**：数据库字段存储目录
+  * **sql**：数据库表结构SQL语句存放目录
+  * **src**：表结构定义的存放目录
+  * **project.sg.json**：项目配置文件
 
 **发行日志**
 
