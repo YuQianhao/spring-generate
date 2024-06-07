@@ -56,10 +56,9 @@ yarn tauri build
 
 我们以**项目**为主题，构建一个**Spring Generate工程**。假设我们有一个项目名为“UserProject”，项目目录如下所示。
 
-```markdown
-> [!NOTE]
-> 在这里的“项目”指的并不是Spring Boot工程，而是管理Spring Generate的模块名称。
-```
+> [!Note]
+>
+> 我们在这里说的项目指的是**Spring Genreate项目**，而不是**Spring Boot项目**。
 
 ```text
 UserProject
